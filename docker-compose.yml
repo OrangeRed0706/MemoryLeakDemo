@@ -41,12 +41,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development      
       - ASPNETCORE_URLS=http://*:80
+    volumes:
+      - ./dumpfiles:/dumps      
     deploy:
         resources:
             limits:
               cpus: "2.0"
-              memory: 256M      
-
+              memory: 1024M      
   prometheus:
     image: prom/prometheus
     restart: always
