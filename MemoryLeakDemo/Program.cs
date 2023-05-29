@@ -45,12 +45,11 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Use the Prometheus
-var counter = Metrics.CreateCounter("demo_counter", "Counts",
-    new CounterConfiguration
+var histogram = Metrics.CreateHistogram("request_duration_milliseconds", "Request duration in milliseconds",
+    new HistogramConfiguration
     {
         LabelNames = new[] { "method", "endpoint" },
-        SuppressInitialValue = true,
-        ExemplarBehavior = ExemplarBehavior.NoExemplars()
+        Buckets = Histogram.ExponentialBuckets(1, 2, 10)  // Configure buckets, if needed
     });
 
 app.Use((context, next) =>
@@ -63,10 +62,12 @@ app.Use((context, next) =>
     finally
     {
         sw.Stop();
-        counter.WithLabels(context.Request.Method, context.Request.Path).Inc(sw.ElapsedMilliseconds);
+        histogram.WithLabels(context.Request.Method, context.Request.Path).Observe(sw.ElapsedMilliseconds);
     }
 });
+
 app.UseMetricServer();
 app.UseHttpMetrics();
+
 
 app.Run();

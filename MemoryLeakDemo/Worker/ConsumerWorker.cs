@@ -64,7 +64,7 @@ namespace MemoryLeakDemo.Worker
 
                         try
                         {
-                            //consumer.Commit(consumeResult);
+                            consumer.Commit(consumeResult);
                         }
                         catch (KafkaException e)
                         {

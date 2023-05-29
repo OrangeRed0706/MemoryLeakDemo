@@ -8,14 +8,6 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
-# Install .NET Core Tools
-RUN dotnet tool install --global dotnet-monitor
-RUN dotnet tool install --global dotnet-counters
-RUN dotnet tool install --global dotnet-dump
-
-# Add .NET Core Tools to PATH
-ENV PATH="/root/.dotnet/tools:${PATH}"
-
 COPY ["MemoryLeakDemo/MemoryLeakDemo.csproj", "MemoryLeakDemo/"]
 RUN dotnet restore "MemoryLeakDemo/MemoryLeakDemo.csproj"
 COPY . .
@@ -28,7 +20,7 @@ RUN dotnet publish "MemoryLeakDemo.csproj" -c Release -o /app/publish /p:UseAppH
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-# Reinstall .NET Core Tools
+# install .NET Core Tools
 RUN dotnet tool install --global dotnet-monitor
 RUN dotnet tool install --global dotnet-counters
 RUN dotnet tool install --global dotnet-dump
