@@ -9,8 +9,14 @@ namespace MemoryLeakDemo.Controllers
     {
         private static List<byte[]> _leakHolder = new();
         const int BytesPerMegabyte = 1024 * 1024;
-        const int SmallObjectSize = 85000;
+        const int SmallObjectSize = 84000;
 
+
+        /// <summary>
+        /// Creates a byte array of the specified size in MB.
+        /// </summary>
+        /// <param name="sizeInMb"></param>
+        /// <returns></returns>
         [HttpPost("SimulateMemoryLeak")]
         public IActionResult SimulateMemoryLeak(int sizeInMb)
         {
@@ -24,6 +30,11 @@ namespace MemoryLeakDemo.Controllers
             return Ok($"Memory leak of {sizeInMb}MB simulated.");
         }
 
+        /// <summary>
+        /// 建立多個小物件
+        /// </summary>
+        /// <param name="totalSizeInMb"></param>
+        /// <returns></returns>
         [HttpPost("CreateMultipleSmallObjectsInSOH")]
         public IActionResult CreateMultipleSmallObjectsInSOH(int totalSizeInMb)
         {
@@ -33,6 +44,7 @@ namespace MemoryLeakDemo.Controllers
             for (var round = 0; round < rounds; round++)
             {
                 var smallObject = new byte[SmallObjectSize];
+                _leakHolder.Add(smallObject);
             }
 
             return Ok($"{rounds} small objects of {SmallObjectSize} bytes each created and stored in SOH.");

@@ -1,5 +1,6 @@
 ﻿using MemoryLeakDemo.Model;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.InteropServices;
 
 namespace MemoryLeakDemo.Controllers
 {

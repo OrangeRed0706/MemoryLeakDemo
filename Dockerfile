@@ -21,6 +21,7 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 # install .NET Core Tools
+RUN apt-get update && apt-get install -y htop
 RUN dotnet tool install --global dotnet-monitor
 RUN dotnet tool install --global dotnet-counters
 RUN dotnet tool install --global dotnet-dump

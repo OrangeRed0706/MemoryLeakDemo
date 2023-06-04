@@ -6,8 +6,7 @@ namespace MemoryLeakDemo.Controllers;
 [Route("[controller]")]
 public class SystemInfoController : ControllerBase
 {
-    [HttpGet]
-    [Route("get-gc-info")]
+    [HttpGet("get-gc-info")]
     public IActionResult GetGCInfo()
     {
         var gen0CollectionCount = GC.CollectionCount(0);
@@ -27,5 +26,12 @@ public class SystemInfoController : ControllerBase
             TotalAllocatedBytesInMB = totalAllocatedBytesInMB,
             AllocatedBytesForCurrentThreadInMB = allocatedBytesForCurrentThreadInMB
         });
+    }
+
+    [HttpGet]
+    [Route("crash")]
+    public IActionResult Crash()
+    {
+        throw new Exception("Crash");
     }
 }
