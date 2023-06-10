@@ -27,11 +27,4 @@ public class SystemInfoController : ControllerBase
             AllocatedBytesForCurrentThreadInMB = allocatedBytesForCurrentThreadInMB
         });
     }
-
-    [HttpGet]
-    [Route("crash")]
-    public IActionResult Crash()
-    {
-        throw new Exception("Crash");
-    }
 }

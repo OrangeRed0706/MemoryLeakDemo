@@ -11,8 +11,6 @@ namespace MemoryLeakDemo.Controllers
     [Route("[controller]")]
     public class ProduceMessageController : ControllerBase
     {
-
-        private readonly ILogger<ProduceMessageController> _logger;
         private readonly ITraceManager _traceManager;
         private readonly IProducerService _producerService;
         private readonly ICustomSerializer<GenerateMessage>? _messageSerializer;
@@ -23,32 +21,33 @@ namespace MemoryLeakDemo.Controllers
             ICustomSerializer<GenerateMessage>? messageSerializer
             )
         {
-            _logger = logger;
             _traceManager = traceManager;
             _producerService = producerService;
             _messageSerializer = messageSerializer;
         }
 
-        [HttpPost(Name = "ProduceMessage")]
-        public async Task Produce([FromQuery] int count, CancellationToken cancellationToken)
+        [HttpPost(Name = "produce-message")]
+        public async Task ProduceMessage([FromQuery] int count, CancellationToken cancellationToken)
         {
             var taskList = new List<Task>();
             var i = 0;
             for (i = 0; i < count; i++)
             {
-                taskList.Add(ProduceMessage(i, cancellationToken));
+                taskList.Add(Produce(i, cancellationToken));
             }
 
             await Task.WhenAll(taskList).ConfigureAwait(false);
         }
 
-        private async Task ProduceMessage(int id, CancellationToken cancellationToken)
+        private async Task Produce(int id, CancellationToken cancellationToken)
         {
             var producer = _producerService.GetProducer<string, GenerateMessage>("MessageGenerate", valueSerializer: _messageSerializer);
 
             var message = new GenerateMessage
             {
                 Id = Guid.NewGuid(),
+                Value = id,
+                RetryCount = 0,
                 CreatedDate = DateTimeOffset.UtcNow.ToLocalTime(),
             };
 

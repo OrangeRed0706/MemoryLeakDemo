@@ -28,11 +28,10 @@ namespace MemoryLeakDemo.Worker
 
         private async Task ConsumerAsync(int numberOfConsumers, CancellationToken cancellationToken)
         {
-            int i;
-            for (i = 0; i < numberOfConsumers; i++)
+            for (var i = 1; i < numberOfConsumers; i++)
             {
                 var groupId = $"ConsumerGroup:[{i}]";
-                Task.Run(() => RunConsumerAsync(groupId, cancellationToken), cancellationToken);
+                Task.Factory.StartNew(() => RunConsumerAsync(groupId, cancellationToken), TaskCreationOptions.LongRunning);
             }
         }
 
@@ -49,7 +48,6 @@ namespace MemoryLeakDemo.Worker
                     _logger.LogInformation("Wager Job is going to stop due to cancel command");
                     break;
                 }
-
                 try
                 {
                     var consumeResult = consumer.MemoryLeakConsume(out var trace, _traceManager, "ConsumerWorker", cancellationToken);
@@ -73,7 +71,6 @@ namespace MemoryLeakDemo.Worker
                         }
 
                     }
-
                 }
                 catch (ConsumeException e)
                 {
@@ -81,7 +78,6 @@ namespace MemoryLeakDemo.Worker
                 }
                 catch (TaskCanceledException ex)
                 {
-                    _logger.LogError($"Hello");
                     _logger.LogError(ex, "task was canceled");
                 }
                 catch (OperationCanceledException e)
@@ -95,7 +91,6 @@ namespace MemoryLeakDemo.Worker
             }
         }
 
-
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation($"Job is starting.");
@@ -105,7 +100,7 @@ namespace MemoryLeakDemo.Worker
                 _logger.LogInformation($"Job is stopping.");
             });
 
-            Task.Factory.StartNew(() => ConsumerAsync(5, stoppingToken), stoppingToken);
+            Task.Factory.StartNew(() => ConsumerAsync(10, stoppingToken), stoppingToken);
 
             _logger.LogInformation($"Job has stopped.");
             return Task.CompletedTask;

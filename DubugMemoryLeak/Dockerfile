@@ -21,18 +21,5 @@ RUN dotnet publish "MemoryLeakDemo.csproj" -c Release -o /app/publish /p:UseAppH
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-# install .NET Core Tools
-RUN dotnet tool install --global dotnet-monitor
-RUN dotnet tool install --global dotnet-counters
-RUN dotnet tool install --global dotnet-dump
-ENV ASPNETCORE_ENVIRONMENT=Development      
-ENV ASPNETCORE_URLS=http://*:80
-ENV COMPlus_DbgMiniDumpType=4
-ENV COMPlus_DbgEnableMiniDump=1
-ENV COMPlus_DbgMiniDumpName=/app/dumpfiles/coredump-%p-%e-%t.dmp
-
-
-# Add .NET Core Tools to PATH
-ENV PATH="/root/.dotnet/tools:${PATH}"
 
 ENTRYPOINT ["dotnet", "MemoryLeakDemo.dll"]

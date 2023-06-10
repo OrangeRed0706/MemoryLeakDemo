@@ -39,7 +39,6 @@ namespace MemoryLeakDemo.Extension
                            .WithTag("kafka.partition", consumeResult.Partition)
                            .StartActive(true))
                 {
-
                     span = parentScope.Span;
                 }
                 scope = traceManager.CreateSpanBuilder(tracerName ?? $"Consumer:{tracerName}")

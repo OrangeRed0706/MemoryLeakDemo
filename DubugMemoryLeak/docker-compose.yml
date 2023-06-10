@@ -42,12 +42,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development      
       - ASPNETCORE_URLS=http://*:80
     volumes:
-      - ./dumpfiles:/app/dumpfiles      
+      - ./dumpInfo:/app/dumpInfo      
     deploy:
         resources:
             limits:
               cpus: "0.5"
-              memory: 256M
+              memory: 512M
 
 networks: 
   common:
