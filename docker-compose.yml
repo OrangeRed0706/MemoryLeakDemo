@@ -42,31 +42,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development      
       - ASPNETCORE_URLS=http://*:80
     volumes:
-      - ./dumpfiles:/app/dumpfiles      
+      - ./dumpInfo:/app/dumpInfo      
     deploy:
         resources:
             limits:
-              cpus: "1.0"
-              memory: 512M      
-  prometheus:
-    image: prom/prometheus
-    restart: always
-    ports:
-      - 9090:9090
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    networks:
-      - common
-
-  grafana:
-    image: grafana/grafana
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=P@ssw0rd
-    restart: always
-    ports:
-      - 3000:3000
-    networks:
-      - common
+              cpus: "0.5"
+              memory: 512M
 
 networks: 
   common:

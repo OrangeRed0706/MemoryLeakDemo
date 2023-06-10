@@ -1,7 +1,4 @@
-﻿using Jaeger.Thrift;
-using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.IO;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace MemoryLeakDemo.Controllers;
 
@@ -9,32 +6,7 @@ namespace MemoryLeakDemo.Controllers;
 [Route("[controller]")]
 public class SystemInfoController : ControllerBase
 {
-    [HttpGet]
-    [Route("memory")]
-    public IActionResult GetMemoryUsage()
-    {
-        var process = System.Diagnostics.Process.GetCurrentProcess();
-        var memoryInBytes = process.WorkingSet64;
-        var memoryInMb = memoryInBytes / 1024 / 1024;
-
-        long totalMemoryInBytes;
-        using (var reader = new StreamReader("/sys/fs/cgroup/memory/memory.limit_in_bytes"))
-        {
-            totalMemoryInBytes = long.Parse(reader.ReadToEnd().Trim());
-        }
-
-        var totalMemoryInMb = totalMemoryInBytes / 1024 / 1024;
-
-        return Ok(new
-        {
-            TotalMemoryInMB = totalMemoryInMb,
-            MemoryUsageInMB = memoryInMb,
-            MemoryUsagePercentage = Math.Round(((double)memoryInMb / totalMemoryInMb) * 100, 2)
-        });
-    }
-
-    [HttpGet]
-    [Route("get-gc-info")]
+    [HttpGet("get-gc-info")]
     public IActionResult GetGCInfo()
     {
         var gen0CollectionCount = GC.CollectionCount(0);
@@ -54,16 +26,5 @@ public class SystemInfoController : ControllerBase
             TotalAllocatedBytesInMB = totalAllocatedBytesInMB,
             AllocatedBytesForCurrentThreadInMB = allocatedBytesForCurrentThreadInMB
         });
-    }
-
-
-    [HttpPost]
-    [Route("gc-collect")]
-    public IActionResult TriggerGC()
-    {
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
-
-        return Ok("GC triggered.");
     }
 }

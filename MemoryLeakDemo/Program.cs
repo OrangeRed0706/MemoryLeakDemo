@@ -4,9 +4,6 @@ using Library.Kafka.Interfaces;
 using Library.Tracing;
 using MemoryLeakDemo.Contract;
 using MemoryLeakDemo.Worker;
-using Prometheus;
-using System.Diagnostics;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -23,7 +20,7 @@ builder.Services.AddHostedService<ConsumerWorker>();
 builder.Services.AddSingleton<ICustomSerializer<GenerateMessage>, CustomSerializer<GenerateMessage>>();
 
 //Library
-builder.Services.AddTracing(builder.Configuration); 
+builder.Services.AddTracing(builder.Configuration);
 builder.Services.AddKafkaProducerService(builder.Configuration);
 builder.Services.AddKafkaConsumerService(builder.Configuration);
 
@@ -38,36 +35,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
-
-// Use the Prometheus
-var histogram = Metrics.CreateHistogram("request_duration_milliseconds", "Request duration in milliseconds",
-    new HistogramConfiguration
-    {
-        LabelNames = new[] { "method", "endpoint" },
-        Buckets = Histogram.ExponentialBuckets(1, 2, 10)  // Configure buckets, if needed
-    });
-
-app.Use((context, next) =>
-{
-    var sw = Stopwatch.StartNew();
-    try
-    {
-        return next();
-    }
-    finally
-    {
-        sw.Stop();
-        histogram.WithLabels(context.Request.Method, context.Request.Path).Observe(sw.ElapsedMilliseconds);
-    }
-});
-
-app.UseMetricServer();
-app.UseHttpMetrics();
-
 
 app.Run();
