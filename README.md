@@ -2,12 +2,13 @@
 
 
 ## Issues
-![](./Pictures/Issues01.png)
 ![](./Pictures/Issues02.png)
-我們的Worker持續有memory leak的問題，大約一個禮拜100mb左右，但因為部屬還算頻繁的關係導致問題不是很明顯，不會到Pod死掉這麼嚴重，但去年世界賽的時候有Code Freezes一段時間沒有部屬，導致這問題又浮現出來，所以就有了這一張單去處理這Issue，在查找的過程中有使用了一些工具和心得，簡單介紹和分享一下
+有一台Worker Service 持續有memory leak的問題，大約一個禮拜100mb左右，在處理這Issue時間的過程中有使用了一些工具和心得，簡單介紹和分享一下
 
 ### 適用場景
-因為他本身的用途蠻廣的，Application Crash、CPU High、Memory Leak、stack trace等等問題都可以去解，最重要的就是收集Dump檔
+本身的用途蠻廣的，Application Crash、CPU High、Memory Leak、stack trace等等問題都可以去解。
+
+最重要的就是收集Dump檔
 
 ## dotnet tools
 
@@ -70,7 +71,7 @@ dumpheap -mt 00007ffbfe420770
 ```
 Address| MT|     Size|
 
-    ![](./Pictures/dumpheap-mt.png)
+![](./Pictures/dumpheap-mt.png)
 
 列出物件的詳細資訊(Method Table、EEClass、Size、Field。
 ```
@@ -85,9 +86,9 @@ do {Address}
 dumpheap -mt 00007faddaa50f90
 ```
 ![](./Pictures/dumpheap-mt2.png)
-可以稍微整理一下這些資訊
 
-拿到MethTable裡面詳細的資訊後
+可以稍微整理一下這些資訊，如果資料量太多強烈建議使用WinDbg、dotmemory
+接著拿到MethTable裡面詳細的資訊後
 ```
 dumpobj {Address}
 do 000001871a56e810
@@ -95,6 +96,7 @@ do 000001871a56e810
 ![](./Pictures/dumpobj-string.png)
 ## example code
 ![](./Pictures/example-code-compare.png)
+在還沒修改之前的程式碼乍看之下沒發生什麼問題，看看了Source code之後有發現其實是不能在一個Scope裡面新建立一個Scope的，會造成在Dispose時判斷說不是當前的Scope而被直接Return
 ![](./Pictures/example-code02.png)
 
 ## 其他工具:
@@ -196,9 +198,6 @@ get snapshot
 1. 找到復現的方式，假設Memory沒有任何增長，代表那塊地方沒有memory leak的問題，可以直接排除掉
 2. 假設有出現memory的增長很有可能只是GC還沒回收
 3. GC有可能已經回收但沒立刻釋放memory，GC內部會把那塊memory標記成可以重新使用，等下次分配使用(為了避免頻繁的記憶體分配和釋放的操作)
-
-後續觀察結果
-![](https://hackmd.io/_uploads/Hkdj5t1wn.png)
 
 ### Reference
 
