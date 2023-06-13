@@ -2,7 +2,7 @@
 
 
 ## Issues
-![](./Pictures/Issues02.png)
+![](./Pictures/Issues02.jpg)
 有一台Worker Service 持續有memory leak的問題，大約一個禮拜100mb左右，在處理這Issue時間的過程中有使用了一些工具和心得，簡單介紹和分享一下
 
 ### 適用場景
